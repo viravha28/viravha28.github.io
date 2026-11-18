@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dashboard Keuangan – Toko Bangunan ABC (Sep 2020)</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_blue.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/id.js"></script>
+<style>
+:root{--bg:#e3f1fc;--panel:#ffffff;--panel2:#f0f7fe;--line:#c6dcf0;--txt:#1e2b3c;--mut:#5d6f86;--green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706;--violet:#7c3aed}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Inter","Segoe UI",Helvetica,Arial,sans-serif;background:var(--bg);color:var(--txt);font-size:14px}
+header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;padding:20px 28px;border-bottom:1px solid var(--line);background:linear-gradient(90deg,#bfe0fa,#e3f1fc)}
+header h1{font-size:20px;font-weight:700}header p{color:var(--mut);font-size:13px;margin-top:2px}
+.badge{padding:6px 12px;border-radius:20px;background:var(--panel2);border:1px solid var(--line);color:var(--mut);font-size:12px}
+.wrap{display:grid;grid-template-columns:270px 1fr;gap:20px;padding:20px 28px}
+@media(max-width:960px){.wrap{grid-template-columns:1fr}}
+aside{box-shadow:0 2px 8px rgba(30,80,140,.08);background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;height:fit-content;position:sticky;top:20px}
+aside h3{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--mut);margin:16px 0 8px}aside h3:first-child{margin-top:0}
+input[type=text],input.date{width:100%;padding:9px 11px;border-radius:8px;border:1px solid var(--line);background:var(--panel2);color:var(--txt);font-size:13px;outline:none}
+input:focus{border-color:var(--blue)}
+.seg{display:flex;background:var(--panel2);border-radius:8px;padding:3px;border:1px solid var(--line)}
+.seg button{flex:1;padding:7px 4px;border:0;background:none;color:var(--mut);border-radius:6px;cursor:pointer;font-size:12px}
+.seg button.on{background:var(--blue);color:#fff}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{padding:6px 10px;border-radius:16px;border:1px solid var(--line);background:var(--panel2);color:var(--mut);cursor:pointer;font-size:12px;transition:.15s;user-select:none}
+.chip.on{border-color:var(--blue);color:var(--blue);background:rgba(37,99,235,.12);font-weight:600}
+.dates{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.btn{width:100%;margin-top:18px;padding:10px;border-radius:8px;border:1px solid var(--line);background:var(--panel2);color:var(--txt);cursor:pointer}
+.btn:hover{border-color:var(--red);color:var(--red)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-bottom:20px}
+.kpi{box-shadow:0 2px 8px rgba(30,80,140,.08);background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;position:relative;overflow:hidden}
+.kpi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--c)}
+.kpi span{color:var(--mut);font-size:12px}.kpi b{display:block;font-size:21px;margin-top:6px}.kpi small{color:var(--mut);font-size:11px}
+.insight{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 18px;margin-bottom:20px;line-height:1.7}
+.insight li{list-style:none}.insight li::before{content:"● ";color:var(--blue)}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+@media(max-width:1100px){.grid{grid-template-columns:1fr}}
+.card{box-shadow:0 2px 8px rgba(30,80,140,.08);background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}
+.card h4{font-size:14px;margin-bottom:2px}.card p.sub{color:var(--mut);font-size:12px;margin-bottom:10px}
+.card .cv{position:relative;height:280px}
+.full{grid-column:1/-1}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;color:var(--mut);font-weight:600;padding:10px;border-bottom:1px solid var(--line);cursor:pointer;white-space:nowrap}
+th:hover{color:var(--txt)}td{padding:9px 10px;border-bottom:1px solid #e1ecf7}
+tr:hover td{background:var(--panel2)}td.num,th.num{text-align:right}
+.tag{padding:2px 8px;border-radius:10px;font-size:11px}
+.in{background:rgba(22,163,74,.12);color:var(--green)}.out{background:rgba(220,38,38,.12);color:var(--red)}
+.tblhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:10px;flex-wrap:wrap}
+.small-btn{padding:7px 12px;border-radius:8px;border:1px solid var(--line);background:var(--panel2);color:var(--txt);cursor:pointer;font-size:12px}
+.small-btn:hover{border-color:var(--blue)}
+footer{color:var(--mut);font-size:12px;text-align:center;padding:16px}
+</style></head><body>
+<header><div><h1>📊 Dashboard Keuangan – Toko Bangunan ABC</h1><p>Periode September 2020 · klik filter atau bagian grafik untuk menyaring data</p></div>
+<div class="badge" id="countBadge">16 transaksi</div></header>
+<div class="wrap">
+<aside>
+ <h3>Cari keterangan</h3><input type="text" id="q" placeholder="mis. pipa, gaji, cat…">
+ <h3>Rentang tanggal</h3><div class="dates"><input class="date" id="d1" placeholder="Dari"><input class="date" id="d2" placeholder="Sampai"></div>
+ <h3>Jenis</h3><div class="seg" id="jenis"><button data-v="Semua" class="on">Semua</button><button data-v="Pemasukan">Masuk</button><button data-v="Pengeluaran">Keluar</button></div>
+ <h3>Kategori</h3><div class="chips" id="kat"></div>
+ <h3>Minggu</h3><div class="chips" id="mgg"></div>
+ <button class="btn" id="reset">↺ Reset semua filter</button>
+</aside>
+<main>
+ <div class="kpis">
+  <div class="kpi" style="--c:var(--green)"><span>Uang masuk</span><b id="kIn">-</b><small id="kInN"></small></div>
+  <div class="kpi" style="--c:var(--red)"><span>Uang keluar</span><b id="kOut">-</b><small id="kOutN"></small></div>
+  <div class="kpi" style="--c:var(--blue)"><span>Selisih (masuk – keluar)</span><b id="kNet">-</b><small id="kNetS"></small></div>
+  <div class="kpi" style="--c:var(--amber)"><span>Saldo kas akhir bulan</span><b id="kSaldo">-</b><small>dari saldo awal Rp20.000.000</small></div>
+  <div class="kpi" style="--c:var(--violet)"><span>Laba / (rugi) bersih</span><b id="kLaba">-</b><small>sesuai laporan laba rugi</small></div>
+ </div>
+ <ul class="insight" id="insight"></ul>
+ <div class="grid">
+  <div class="card"><h4>Uang Masuk vs Uang Keluar</h4><p class="sub">Klik batang untuk memfilter jenis</p><div class="cv"><canvas id="cJenis"></canvas></div></div>
+  <div class="card"><h4>Ke Mana Uang Mengalir?</h4><p class="sub">Porsi per kategori · klik irisan untuk memfilter</p><div class="cv"><canvas id="cKat"></canvas></div></div>
+  <div class="card"><h4>Arus Kas per Minggu</h4><p class="sub">Klik kolom untuk memfilter minggu</p><div class="cv"><canvas id="cMgg"></canvas></div></div>
+  <div class="card"><h4>Perjalanan Saldo Kas</h4><p class="sub">Saldo setelah setiap transaksi yang tampil</p><div class="cv"><canvas id="cSaldo"></canvas></div></div>
+  <div class="card full"><h4>Ringkasan Laba Rugi (September 2020)</h4><p class="sub">Dari penjualan sampai laba/rugi bersih</p><div class="cv"><canvas id="cPL"></canvas></div></div>
+  <div class="card full"><div class="tblhead"><div><h4>Daftar Transaksi</h4><p class="sub" style="margin:0">Klik judul kolom untuk mengurutkan</p></div><button class="small-btn" id="csv">⬇ Unduh CSV</button></div>
+   <div style="overflow-x:auto"><table><thead><tr><th data-k="tgl">Tanggal</th><th data-k="ket">Keterangan</th><th data-k="kat">Kategori</th><th data-k="jenis">Jenis</th><th data-k="jml" class="num">Jumlah</th></tr></thead><tbody id="tb"></tbody></table></div></div>
+ </div>
+</main></div>
+<footer>Data diambil dari workbook "Lab - Start Tracelight Data 1.xlsx" (Sheet1 &amp; Laporan Laba Rugi). Ini salinan data; perubahan di Excel tidak otomatis ikut ke halaman ini.</footer>
+<script>
+const DATA=[{"no": 2, "tgl": "2020-09-02", "minggu": "Minggu 1", "ket": "Penjualan cat 2.5L (1 buah)", "jenis": "Pemasukan", "kat": "Penjualan", "jml": 190000}, {"no": 3, "tgl": "2020-09-02", "minggu": "Minggu 1", "ket": "Penjualan pipa pvc 3/4 inch (100 buah)", "jenis": "Pemasukan", "kat": "Penjualan", "jml": 3500000}, {"no": 4, "tgl": "2020-09-05", "minggu": "Minggu 1", "ket": "Pembayaran invoice stok tanki 600L (5 buah)", "jenis": "Pengeluaran", "kat": "Pembelian stok", "jml": 4500000}, {"no": 5, "tgl": "2020-09-09", "minggu": "Minggu 2", "ket": "Beli ATK", "jenis": "Pengeluaran", "kat": "Beban operasional", "jml": 150000}, {"no": 6, "tgl": "2020-09-10", "minggu": "Minggu 2", "ket": "Penjualan baut", "jenis": "Pemasukan", "kat": "Penjualan", "jml": 70000}, {"no": 7, "tgl": "2020-09-13", "minggu": "Minggu 2", "ket": "Penjualan pipa pvc 2 inch (25 buah)", "jenis": "Pemasukan", "kat": "Penjualan", "jml": 2000000}, {"no": 8, "tgl": "2020-09-13", "minggu": "Minggu 2", "ket": "Pembayaran invoice stok pipa 3/4 inch (50 buah)", "jenis": "Pengeluaran", "kat": "Pembelian stok", "jml": 1350000}, {"no": 9, "tgl": "2020-09-15", "minggu": "Minggu 3", "ket": "Penjualan cat 5kg (5 buah)", "jenis": "Pemasukan", "kat": "Penjualan", "jml": 675000}, {"no": 10, "tgl": "2020-09-16", "minggu": "Minggu 3", "ket": "Beli meja kantor", "jenis": "Pengeluaran", "kat": "Aset tetap", "jml": 600000}, {"no": 11, "tgl": "2020-09-19", "minggu": "Minggu 3", "ket": "Ongkos pengiriman barang", "jenis": "Pengeluaran", "kat": "Beban operasional", "jml": 125000}, {"no": 12, "tgl": "2020-09-21", "minggu": "Minggu 3", "ket": "Bayar cicilan truk", "jenis": "Pengeluaran", "kat": "Cicilan truk", "jml": 2500000}, {"no": 13, "tgl": "2020-09-22", "minggu": "Minggu 4", "ket": "Penjualan cat 2.5L (3 buah)", "jenis": "Pemasukan", "kat": "Penjualan", "jml": 570000}, {"no": 14, "tgl": "2020-09-22", "minggu": "Minggu 4", "ket": "Pembayaran invoice stok cat 5kg (20 buah)", "jenis": "Pengeluaran", "kat": "Pembelian stok", "jml": 2500000}, {"no": 15, "tgl": "2020-09-25", "minggu": "Minggu 4", "ket": "Bayar sewa bangunan", "jenis": "Pengeluaran", "kat": "Beban operasional", "jml": 5000000}, {"no": 16, "tgl": "2020-09-25", "minggu": "Minggu 4", "ket": "Bayar listrik, air, internet", "jenis": "Pengeluaran", "kat": "Beban operasional", "jml": 1250000}, {"no": 17, "tgl": "2020-09-25", "minggu": "Minggu 4", "ket": "Bayar gaji karyawan", "jenis": "Pengeluaran", "kat": "Beban operasional", "jml": 4000000}];const PL={"Penjualan": 7005000, "HPP (pembelian stok)": -8350000, "Beban operasional": -10537500, "Pajak (PPh final)": -35025};const SALDO_AWAL=20000000;const LABA=-11917525;
+Chart.register(ChartDataLabels);
+Chart.defaults.color="#5d6f86";Chart.defaults.borderColor="#c6dcf0";Chart.defaults.font.family="Inter,Segoe UI,Helvetica,Arial";
+const rp=v=>(v<0?"-":"")+"Rp"+Math.abs(Math.round(v)).toLocaleString("id-ID");
+const jt=v=>(v/1e6).toLocaleString("id-ID",{maximumFractionDigits:1})+" jt";
+const fd=s=>{const d=new Date(s+"T00:00");return d.toLocaleDateString("id-ID",{day:"2-digit",month:"short"})};
+const KATS=[...new Set(DATA.map(d=>d.kat))],MGG=[...new Set(DATA.map(d=>d.minggu))];
+const KCOL={"Penjualan":"#16a34a","Pembelian stok":"#d97706","Beban operasional":"#dc2626","Cicilan truk":"#7c3aed","Aset tetap":"#2563eb"};
+const st={q:"",d1:null,d2:null,jenis:"Semua",kat:new Set(),mgg:new Set(),sort:{k:"tgl",dir:1}};
+function chips(id,list,set){const el=document.getElementById(id);el.innerHTML="";list.forEach(v=>{const c=document.createElement("div");c.className="chip"+(set.has(v)?" on":"");c.textContent=v;c.onclick=()=>{set.has(v)?set.delete(v):set.add(v);render()};el.appendChild(c)})}
+const fp1=flatpickr("#d1",{locale:"id",dateFormat:"Y-m-d",altInput:true,altFormat:"d/m/Y",defaultDate:"2020-09-01",onChange:(s,str)=>{st.d1=str||null;render()}});
+const fp2=flatpickr("#d2",{locale:"id",dateFormat:"Y-m-d",altInput:true,altFormat:"d/m/Y",defaultDate:"2020-09-30",onChange:(s,str)=>{st.d2=str||null;render()}});
+document.getElementById("q").oninput=e=>{st.q=e.target.value.toLowerCase();render()};
+document.querySelectorAll("#jenis button").forEach(b=>b.onclick=()=>{st.jenis=b.dataset.v;render()});
+document.getElementById("reset").onclick=()=>{st.q="";st.d1=st.d2=null;st.jenis="Semua";st.kat.clear();st.mgg.clear();document.getElementById("q").value="";fp1.setDate("2020-09-01");fp2.setDate("2020-09-30");render()};
+document.querySelectorAll("th").forEach(th=>th.onclick=()=>{const k=th.dataset.k;st.sort.dir=st.sort.k===k?-st.sort.dir:1;st.sort.k=k;render()});
+function filtered(){return DATA.filter(d=>(!st.q||d.ket.toLowerCase().includes(st.q))&&(!st.d1||d.tgl>=st.d1)&&(!st.d2||d.tgl<=st.d2)&&(st.jenis==="Semua"||d.jenis===st.jenis)&&(!st.kat.size||st.kat.has(d.kat))&&(!st.mgg.size||st.mgg.has(d.minggu)))}
+const sum=(a,f)=>a.filter(f).reduce((s,d)=>s+d.jml,0);
+const baseOpt=(extra={})=>Object.assign({responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>" "+rp(c.raw)}},datalabels:{display:false}}},extra);
+const cJ=new Chart(cJenis,{type:"bar",data:{labels:["Uang masuk","Uang keluar"],datasets:[{data:[0,0],backgroundColor:["#16a34a","#dc2626"],borderRadius:8,barThickness:46}]},
+ options:baseOpt({indexAxis:"y",scales:{x:{ticks:{callback:jt},grid:{color:"#dbe8f5"}},y:{grid:{display:false}}},plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>" "+rp(c.raw)}},datalabels:{anchor:"end",align:"end",color:"#1e2b3c",formatter:rp,clamp:true}},layout:{padding:{right:90}},
+ onClick:(e,el)=>{if(el.length){const v=["Pemasukan","Pengeluaran"][el[0].index];st.jenis=st.jenis===v?"Semua":v;render()}}})});
+const cK=new Chart(cKat,{type:"doughnut",data:{labels:KATS,datasets:[{data:[],backgroundColor:KATS.map(k=>KCOL[k]),borderColor:"#ffffff",borderWidth:3}]},
+ options:baseOpt({cutout:"62%",plugins:{legend:{display:true,position:"right",labels:{boxWidth:12,padding:12}},tooltip:{callbacks:{label:c=>" "+c.label+": "+rp(c.raw)}},datalabels:{color:"#fff",font:{weight:"bold"},formatter:(v,c)=>{const t=c.dataset.data.reduce((a,b)=>a+b,0);return t&&v/t>.06?Math.round(v/t*100)+"%":""}}},
+ onClick:(e,el)=>{if(el.length){const k=KATS[el[0].index];st.kat.has(k)?st.kat.delete(k):st.kat.add(k);render()}}})});
+const cM=new Chart(cMgg,{type:"bar",data:{labels:MGG,datasets:[{label:"Masuk",data:[],backgroundColor:"#16a34a",borderRadius:6},{label:"Keluar",data:[],backgroundColor:"#dc2626",borderRadius:6}]},
+ options:baseOpt({scales:{y:{ticks:{callback:jt},grid:{color:"#dbe8f5"}},x:{grid:{display:false}}},plugins:{legend:{display:true,position:"bottom"},tooltip:{callbacks:{label:c=>" "+c.dataset.label+": "+rp(c.raw)}},datalabels:{display:false}},
+ onClick:(e,el)=>{if(el.length){const m=MGG[el[0].index];st.mgg.has(m)?st.mgg.delete(m):st.mgg.add(m);render()}}})});
+const g=cSaldo.getContext("2d").createLinearGradient(0,0,0,280);g.addColorStop(0,"rgba(37,99,235,.30)");g.addColorStop(1,"rgba(37,99,235,0)");
+const cS=new Chart(cSaldo,{type:"line",data:{labels:[],datasets:[{data:[],borderColor:"#2563eb",backgroundColor:g,fill:true,tension:.3,pointRadius:4,pointBackgroundColor:"#2563eb"}]},
+ options:baseOpt({scales:{y:{min:0,ticks:{callback:jt},grid:{color:"#dbe8f5"}},x:{grid:{display:false}}},plugins:{legend:{display:false},datalabels:{display:false},tooltip:{callbacks:{title:c=>c[0].label,label:c=>" Saldo: "+rp(c.raw),afterLabel:c=>c.dataIndex?" "+cS.$tx[c.dataIndex-1].ket:""}}}})});
+// P&L cascade
+const plL=Object.keys(PL).concat(["Laba/(rugi) bersih"]);let run=0;const plD=[];Object.values(PL).forEach(v=>{plD.push([run,run+v]);run+=v});plD.push([0,run]);
+new Chart(cPL,{type:"bar",data:{labels:plL,datasets:[{data:plD,backgroundColor:plD.map((d,i)=>i===0?"#16a34a":i===plD.length-1?"#7c3aed":"#dc2626"),borderRadius:6,barThickness:60}]},
+ options:baseOpt({scales:{y:{ticks:{callback:jt},grid:{color:"#dbe8f5"}},x:{grid:{display:false}}},plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>" "+rp(c.raw[1]-c.raw[0])}},datalabels:{color:"#1e2b3c",anchor:"end",align:"top",formatter:v=>rp(v[1]-v[0])}}})});
+function render(){
+ document.querySelectorAll("#jenis button").forEach(b=>b.classList.toggle("on",b.dataset.v===st.jenis));
+ chips("kat",KATS,st.kat);chips("mgg",MGG,st.mgg);
+ const f=filtered();const isIn=d=>d.jenis==="Pemasukan",isOut=d=>d.jenis==="Pengeluaran";
+ const tin=sum(f,isIn),tout=sum(f,isOut),net=tin-tout;
+ kIn.textContent=rp(tin);kInN.textContent=f.filter(isIn).length+" transaksi";
+ kOut.textContent=rp(tout);kOutN.textContent=f.filter(isOut).length+" transaksi";
+ kNet.textContent=rp(net);kNet.style.color=net>=0?"var(--green)":"var(--red)";kNetS.textContent=net>=0?"Surplus":"Defisit";
+ const allNet=sum(DATA,isIn)-sum(DATA,isOut);kSaldo.textContent=rp(SALDO_AWAL+allNet);kLaba.textContent=rp(LABA);kLaba.style.color="var(--red)";
+ countBadge.textContent=f.length+" dari "+DATA.length+" transaksi";
+ cJ.data.datasets[0].data=[tin,tout];cJ.update();
+ cK.data.datasets[0].data=KATS.map(k=>sum(f,d=>d.kat===k));cK.update();
+ cM.data.datasets[0].data=MGG.map(m=>sum(f,d=>d.minggu===m&&isIn(d)));cM.data.datasets[1].data=MGG.map(m=>sum(f,d=>d.minggu===m&&isOut(d)));
+ cM.data.datasets.forEach(ds=>ds.backgroundColor=MGG.map(m=>(!st.mgg.size||st.mgg.has(m))?(ds.label==="Masuk"?"#16a34a":"#dc2626"):"#cbd5e1"));cM.update();
+ const ord=[...f].sort((a,b)=>a.no-b.no);let s=SALDO_AWAL;const pts=[s];ord.forEach(d=>{s+=isIn(d)?d.jml:-d.jml;pts.push(s)});
+ cS.$tx=ord;cS.data.labels=["Awal"].concat(ord.map(d=>fd(d.tgl)));cS.data.datasets[0].data=pts;cS.update();
+ const outs={};f.filter(isOut).forEach(d=>outs[d.kat]=(outs[d.kat]||0)+d.jml);const top=Object.entries(outs).sort((a,b)=>b[1]-a[1])[0];
+ const big=[...f].sort((a,b)=>b.jml-a.jml)[0];
+ insight.innerHTML=f.length?[
+  `Pada data yang dipilih, uang masuk <b style="color:var(--green)">${rp(tin)}</b> dan uang keluar <b style="color:var(--red)">${rp(tout)}</b>, jadi <b>${net>=0?"surplus":"defisit"} ${rp(Math.abs(net))}</b>.`,
+  top?`Pengeluaran terbesar ada di <b>${top[0]}</b> (${rp(top[1])}, ${Math.round(top[1]/tout*100)}% dari uang keluar).`:"Tidak ada pengeluaran pada pilihan ini.",
+  `Transaksi terbesar: <b>${big.ket}</b> (${rp(big.jml)}) pada ${fd(big.tgl)}.`].map(t=>`<li>${t}</li>`).join(""):"<li>Tidak ada transaksi yang cocok dengan filter.</li>";
+ const k=st.sort.k,dir=st.sort.dir;const rows=[...f].sort((a,b)=>(a[k]>b[k]?1:a[k]<b[k]?-1:a.no-b.no)*dir);
+ document.querySelectorAll("th").forEach(th=>{th.textContent=th.textContent.replace(/ [▲▼]$/,"");if(th.dataset.k===k)th.textContent+=dir>0?" ▲":" ▼"});
+ tb.innerHTML=rows.map(d=>`<tr><td>${fd(d.tgl)}</td><td>${d.ket}</td><td><span style="color:${KCOL[d.kat]}">●</span> ${d.kat}</td><td><span class="tag ${isIn(d)?"in":"out"}">${d.jenis}</span></td><td class="num" style="color:${isIn(d)?"var(--green)":"var(--red)"}">${isIn(d)?"+":"−"}${rp(d.jml)}</td></tr>`).join("")||`<tr><td colspan="5" style="text-align:center;color:var(--mut)">Tidak ada transaksi</td></tr>`;
+ csv.onclick=()=>{const t="Tanggal,Keterangan,Kategori,Jenis,Jumlah\n"+rows.map(d=>[d.tgl,'"'+d.ket+'"',d.kat,d.jenis,d.jml].join(",")).join("\n");const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([t],{type:"text/csv"}));a.download="transaksi_terfilter.csv";a.click()};
+}
+st.d1="2020-09-01";st.d2="2020-09-30";render();
+</script></body></html>
